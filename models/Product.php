@@ -13,6 +13,16 @@ use Yii;
  */
 class Product extends \yii\db\ActiveRecord
 {
+    public function behaviors()
+    {
+        return [
+            'CurrencyWork' => [
+                'class' => 'app\modules\currency\components\currency_flow\behaviors\CurrencyWorkBehavior',
+                'nameVariable' => 'price',
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */

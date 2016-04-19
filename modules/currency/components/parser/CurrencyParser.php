@@ -123,7 +123,7 @@ class CurrencyParser extends Component
                 $model->char_code = $item['CharCode'];
                 $model->num_code = $item['NumCode'];
                 $model->nominal = (int) $item['Nominal'];
-                $model->value = (double) $item['Value'];
+                $model->value = (double) str_replace(',', '.', $item['Value']);
                 $model->valute_id = $item['@attributes']['ID'];
                 $model->name = $item['Name'];
 

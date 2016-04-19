@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\modules\currency\components\parser\CurrencyParser;
 use Faker\Provider\zh_TW\DateTime;
 use Yii;
 
@@ -85,5 +86,42 @@ class Currency extends \yii\db\ActiveRecord
 
         //записи нет. создаем ее
         return $this->save();
+    }
+
+    /**
+     * найдет в базе, или загрузит с сервера курс     *
+     *
+     * @param $code
+     * @param null $date
+     * @return Currency
+     */
+    public static function getByCode($code, $date = null) {
+        if($date === null) {
+            $date = date('d/m/Y', time());
+        }
+
+        $date = str_replace('/', '-', $date);
+        $date = strtotime($date);
+
+        $model = self::findOne([
+            'char_code' => $code,
+            'date' => $date,
+        ]);
+
+        //если такой модели нет. загрузим данные от сервера
+        if(!$model) {
+            $parser = new CurrencyParser();
+            $parser->date = date('d/m/Y', $date);
+            $parser->initUrl();
+            $parser->parse();
+            $parser->saveData();
+
+            return self::findOne([
+                'char_code' => $code,
+                'date' => $date,
+            ]);
+        }
+
+        return $model;
     }
 }

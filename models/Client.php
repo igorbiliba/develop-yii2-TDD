@@ -15,6 +15,16 @@ use Yii;
  */
 class Client extends \yii\db\ActiveRecord
 {
+    public function behaviors()
+    {
+        return [
+            'CurrencyWork' => [
+                'class' => 'app\modules\currency\components\currency_flow\behaviors\CurrencyWorkBehavior',
+                'nameVariable' => 'balance',
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
