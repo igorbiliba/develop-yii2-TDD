@@ -13,7 +13,7 @@ class CurrencyTest extends TestCase
 
     public function testLoadDate() {
         $this->specify('load data', function() {
-            expect('work load data by server and base', Currency::getByCode('USD'))->notNull();
+            expect('work load data by server and base', Currency::getByCode('USD', '01/01/2016'))->notNull();
         });
     }
 }

@@ -27,7 +27,13 @@ class CurrencyRUB extends BaseCurrency
     /**
      * вернет сумму на текущий курс
      */
-    public function getPrice() {
-        return doubleval($this->value);
+    public function getPrice($formate = false) {
+        $v = doubleval($this->value);
+
+        if($formate) {
+            return number_format($v, 2, ',', ' ');
+        }
+
+        return $v;
     }
 }

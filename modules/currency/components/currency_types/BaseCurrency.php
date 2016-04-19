@@ -60,11 +60,17 @@ abstract class BaseCurrency extends Component
     /**
      * вернет сумму на текущий курс
      */
-    public function getPrice() {
+    public function getPrice($formate = false) {
         $rateVal = $this->getRate();
 
         if($rateVal == 0) return 0;
 
-        return doubleval($this->value / $rateVal);
+        $v = doubleval($this->value / $rateVal);
+
+        if($formate) {
+            return number_format($v, 2, ',', ' ');
+        }
+
+        return $v;
     }
 }
