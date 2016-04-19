@@ -14,8 +14,12 @@ class m160419_100053_create_currency extends Migration
             'nominal' => $this->integer() . ' COMMENT "Номинал"',
             'name' => $this->string(64) . ' COMMENT "Название"',
             'value' => $this->money() . ' COMMENT "Значение"',
-            'date' => $this->timestamp(),
+            'date' => $this->integer()->notNull() . ' COMMENT "Дата в unixtime"',
         ]);
+
+        $this->createIndex('currency_valute_code_date_idx', 'currency', [
+            'char_code', 'date'
+        ], true);
     }
 
     public function down()

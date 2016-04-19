@@ -18,7 +18,7 @@ class CurrencyParser extends Component
     /**
      * дата парсинга
      */
-    private $date = null;
+    public $date = null;
 
     /**
      * данные парсинга
@@ -39,15 +39,6 @@ class CurrencyParser extends Component
      */
     public function getUrl() {
         return $this->url;
-    }
-
-    /**
-     * установить дату парсинга
-     *
-     * @param $value
-     */
-    public function setDate($value) {
-        $this->date = str_replace(['.', ','], ['/', '/'], $value);
     }
 
     /**
@@ -86,9 +77,60 @@ class CurrencyParser extends Component
     /**
      * венет данные
      *
-     * @return array
+     * @return string
      */
     public function getData() {
         return $this->data;
+    }
+
+    /**
+     * вернет данные в виде массива
+     *
+     * @return array
+     */
+    public function getArrayData() {
+        $xmlstring = $this->getData();
+
+        try {
+            $xml = simplexml_load_string($xmlstring);
+            $json = json_encode($xml);
+            $array = json_decode($json, TRUE);
+
+            return $array;
+        }
+        catch(Exception $e) {}
+
+        return null;
+    }
+
+    /**
+     * сохранит данные в модели
+     *
+     * @param string $modelName
+     * @return bool
+     */
+    public function saveData($data = null, $modelName = '\\app\\models\\Currency') {
+        if($data === null) {
+            $data = $this->getArrayData();
+        }
+
+        $date = $data['@attributes']['Date'];
+
+        if(isset($data['Valute']) && is_array($data['Valute'])) {
+            foreach($data['Valute'] as $item) {
+                /* @var $model \app\models\Currency */
+                $model = new $modelName;
+                $model->char_code = $item['CharCode'];
+                $model->num_code = $item['NumCode'];
+                $model->nominal = (int) $item['Nominal'];
+                $model->value = (double) $item['Value'];
+                $model->valute_id = $item['@attributes']['ID'];
+                $model->name = $item['Name'];
+
+                if(!$model->createOrUpdate($date)) return false;
+            }
+        }
+
+        return true;
     }
 }

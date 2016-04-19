@@ -4,23 +4,33 @@ namespace tests\codeception\unit\currency\components;
 
 use app\modules\currency\components\parser\CurrencyParser;
 use Yii;
-use yii\codeception\TestCase;
+use tests\codeception\unit\TestCase;
 use Codeception\Specify;
 
 class CurrencyParserTest extends TestCase
 {
-    public function testParseData() {
-        $date = '01/01/2016';
+    use Specify;
 
+    public function testParse() {
         $parser = new CurrencyParser();
-        $parser->date = $date;
+        $parser->date = '01/01/2016';
         $parser->initUrl();
 
-        expect('valid url', $parser->url)->contains($date);
-        $data = $parser->loadDateBySite();
-        expect('load data by date', $data)->contains(str_replace('/', '.', $date));
-        expect('has items currency', $data)->contains('Valute');
-        expect('parse worked', $parser->parse())->true();
-        expect('parser data valid', $parser->data)->equals($data);
+        $this->specify('test parse work', function() use($parser) {
+            expect('valid url', $parser->url)->contains($parser->date);
+            $data = $parser->loadDateBySite();
+            expect('load data by date', $data)->contains(str_replace('/', '.', $parser->date));
+            expect('has items currency', $data)->contains('Valute');
+            expect('parse worked', $parser->parse())->true();
+            expect('parser data valid', $parser->data)->equals($data);
+        });
+
+        $this->specify('test save data', function() use($parser) {
+            expect('parse worked', $parser->parse())->true();
+            $arr = $parser->getArrayData();
+            expect('work array data formater', $arr)->hasKey('Valute');
+            $arr['Valute'] = [$arr['Valute'][0]];
+            expect('work save data in base', $parser->saveData($arr))->true();
+        });
     }
 }
